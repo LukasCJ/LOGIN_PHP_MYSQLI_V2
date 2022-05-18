@@ -3,7 +3,7 @@
 <section>
     <div class="section_header"><h2>Sign Up</h2></div>
     <div class="section_main">
-        <form action="includes/signup.inc.php" method="post">
+        <form action="inc/signup.inc.php" method="post">
             <input type="text" name="name" placeholder="Full Name...">
             <input type="text" name="email" placeholder="Email..">
             <input type="text" name="uid" placeholder="Username..">

@@ -29,7 +29,7 @@
                     <?php
                         if (isset($_SESSION["useruid"])) {
                             echo '<li class="nav_item"><a href="profile.php"><p>Profile</p></a></li>';
-                            echo '<li class="nav_item"><a href="includes/logout.inc.php"><p>Log Out</p></a></li>';
+                            echo '<li class="nav_item"><a href="inc/logout.inc.php"><p>Log Out</p></a></li>';
                         }
                         else {
                             echo '<li class="nav_item"><a href="signup.php"><p>Sign up</p></a></li>';
