@@ -1,26 +1,23 @@
 CREATE TABLE users (
-    user_id int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    user_name varchar(128) NOT NULL,
-    user_email varchar(128) NOT NULL,
-    user_uid varchar(128) NOT NULL,
-    user_pwd varchar(128) NOT NULL,
-    user_ratings json NOT NULL,
-    user_reviews json NOT NULL,
-    user_diary json NOT NULL
+    `id` int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    `name` varchar(128) NOT NULL,
+    `email` varchar(128) NOT NULL,
+    `uid` varchar(128) NOT NULL,
+    `pwd` varchar(128) NOT NULL
 );
 
 CREATE TABLE feature_films (
-    film_id int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    film_name varchar(128) NOT NULL,
-    film_date date NOT NULL,
-    film_poster_path varchar(128) NOT NULL,
-    film_bg_path varchar(128) NOT NULL,
-    film_description text NOT NULL,
-    film_length time NOT NULL,
-    film_rating float(2) NOT NULL,
-    film_related json NOT NULL, -- includes both similar and franchise
-    film_cast json NOT NULL,
-    film_crew json NOT NULL
+    `id` int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    `name` varchar(128) NOT NULL,
+    `date` date NOT NULL,
+    `poster_path` varchar(128) NOT NULL,
+    `bg_path` varchar(128) NOT NULL,
+    `description` text NOT NULL,
+    `length` time NOT NULL,
+    `rating` float(2) NOT NULL,
+    `related` json NOT NULL, -- includes both similar and franchise
+    `cast` json NOT NULL,
+    `crew` json NOT NULL
 );
 
 CREATE TABLE short_films (
@@ -56,8 +53,8 @@ CREATE TABLE series (
 );
 
 CREATE TABLE series_seasons (
-    season_number int(4) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    season_for_series varchar(128) NOT NULL,
+    season_number int(4) NOT NULL,
+    season_series_id varchar(128) NOT NULL,
     season_length_episodes int(5) NOT NULL,
     season_length_time time NOT NULL,
     season_date date NOT NULL, -- if unfinished: first ep date, if finished: first ep date "-" last ep date
@@ -69,10 +66,10 @@ CREATE TABLE series_seasons (
 );
 
 CREATE TABLE series_episodes (
-    episode_number_season int(5) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    episode_number_series int(5) NOT NULL,
-    episode_for_series varchar(128) NOT NULL,
-    episode_for_season varchar(128) NOT NULL,
+    episode_number_season int(5) NOT NULL, -- which episode is it of entire series?
+    episode_number_series int(5) NOT NULL, -- which episode is it of this season?
+    episode_series_id varchar(128) NOT NULL,
+    episode_season varchar(128) NOT NULL,
     episode_name varchar(128) NOT NULL,
     episode_date date NOT NULL,
     episode_bg_path varchar(128) NOT NULL,
@@ -96,42 +93,40 @@ CREATE TABLE games (
 );
 
 CREATE TABLE ratings (
-    rating_id int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    rating_for_user int(11) NOT NULL,
-    rating_for_item_type varchar(128) NOT NULL,
-    rating_for_item int(11) NOT NULL,
-    rating_watched bit NOT NULL,
+    rating_user_id int(11) NOT NULL,
+    rating_item_type varchar(128) NOT NULL, -- film, game, show, review
+    rating_item_id int(11) NOT NULL,
+    rating_user_id int(11), -- if type = review
     rating float(2) NOT NULL,
-    rating_like bool NOT NULL
+    rating_like bit NOT NULL
 );
 
 CREATE TABLE reviews (
-    review_id int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    review_for_user int(11) NOT NULL, -- id
-    review_for_item_type varchar(128) NOT NULL,
-    review_for_item int(11) NOT NULL, -- id
+    review_user_id int(11) NOT NULL,
+    review_id int(11) NOT NULL, -- every user`s reviews has its own set of ids
+    review_item_type varchar(128) NOT NULL,
+    review_item_id int(11) NOT NULL,
     review_rating float(2) NOT NULL,
     review_like bit NOT NULL,
     review_text text NOT NULL,
-    review_date date NOT NULL
+    review_date datetime NOT NULL
 );
 
 CREATE TABLE diary_entries (
-    entry_id int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    entry_for_user int(11) NOT NULL,
-    entry_for_item_type varchar(128) NOT NULL,
-    entry_for_item int(11) NOT NULL,
+    entry_user_id int(11) NOT NULL,
+    entry_item_type varchar(128) NOT NULL,
+    entry_item_id int(11) NOT NULL,
     entry_rating float(2) NOT NULL,
-    entry_likes bit NOT NULL,
+    entry_like bit NOT NULL,
     entry_review bit NOT NULL,
-    entry_review_id int(11) NOT NULL,
+    entry_review_id int(11),
     entry_date_completion datetime NOT NULL, -- datetime för att lättare sortera i "activity from friends"
     entry_date_start date, -- optional
     entry_first bit -- is it a rewatch?
 );
 
 CREATE TABLE follow (
-    follow_from_id
-    follow_to_id
-
+    follow_from_id int(11) NOT NULL,
+    follow_to_id int(11) NOT NULL,
+    follow_status varchar(1) NOT NULL -- P: Pending request, F: Friends, B: Blocked
 )

@@ -45,7 +45,7 @@ function pwdMatch($pwd, $pwdRe) {
 }
 
 function uidExists($conn, $username, $email) {
-    $sql = "SELECT * FROM users WHERE usersUid = ? OR usersEmail = ?;"; //checks whether either username or email are taken; checks wether they already exists in the "users" table
+    $sql = "SELECT * FROM `users` WHERE `uid` = ? OR `email` = ?;"; //checks whether either username or email are taken; checks wether they already exists in the "users" table
     $stmt = mysqli_stmt_init($conn); //prevents visitors from damaging the website by writing stuff in the input-fields. explained at 1:10:30 in the video
     if (!mysqli_stmt_prepare($stmt, $sql)) {
         header("location: ../signup.php?error=stmtfailed");
@@ -69,7 +69,7 @@ function uidExists($conn, $username, $email) {
 }
 
 function createUser($conn, $name, $email, $username, $pwd) {
-    $sql = "INSERT INTO users (usersName, usersEmail, usersUid, usersPwd) VALUES (?, ?, ?, ?);";
+    $sql = "INSERT INTO `users` (`name`, `email`, `uid`, `pwd`) VALUES (?, ?, ?, ?);";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
         header("location: ../signup.php?error=stmtfailed");
@@ -104,7 +104,7 @@ function loginUser($conn, $username, $pwd) {
         exit();
     }
 
-    $pwdHashed = $uidExists["usersPwd"];
+    $pwdHashed = $uidExists["pwd"];
     $checkPwd = password_verify($pwd, $pwdHashed);
 
     if ($checkPwd === false) {
@@ -113,8 +113,8 @@ function loginUser($conn, $username, $pwd) {
     }
     else if ($checkPwd === true) {
         session_start();
-        $_SESSION["userid"] = $uidExists["usersId"];
-        $_SESSION["useruid"] = $uidExists["usersUid"];
+        $_SESSION["userid"] = $uidExists["id"];
+        $_SESSION["useruid"] = $uidExists["uid"];
         header("location: ../index.php");
         exit();
     }
