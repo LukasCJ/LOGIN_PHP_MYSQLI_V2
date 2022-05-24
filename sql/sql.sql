@@ -13,7 +13,7 @@ CREATE TABLE feature_films (
     `poster_path` varchar(128) NOT NULL,
     `bg_path` varchar(128) NOT NULL,
     `description` text NOT NULL,
-    `length` time NOT NULL,
+    `length` time NOT NULL, -- kom på ett sätt att sätta flera olika längder för olika versioner
     `rating` float(2) NOT NULL,
     `related` json NOT NULL, -- includes both similar and franchise
     `cast` json NOT NULL,
@@ -21,15 +21,15 @@ CREATE TABLE feature_films (
 );
 
 CREATE TABLE short_films (
-    sfilm_id int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    sfilm_name varchar(128) NOT NULL,
-    sfilm_date date NOT NULL,
-    sfilm_poster_path varchar(128) NOT NULL,
-    sfilm_bg_path varchar(128) NOT NULL,
-    sfilm_description text NOT NULL,
-    sfilm_length time NOT NULL,
-    sfilm_rating float(2) NOT NULL,
-    sfilm_related json NOT NULL,
+    `id` int(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    `name` varchar(128) NOT NULL,
+    `date` date NOT NULL,
+    `poster_path` varchar(128) NOT NULL,
+    `bg_path` varchar(128) NOT NULL,
+    `description` text NOT NULL,
+    `length` time NOT NULL,
+    `rating` float(2) NOT NULL,
+    `related` json NOT NULL,
     sfilm_cast json NOT NULL,
     sfilm_crew json NOT NULL
 );
@@ -93,12 +93,12 @@ CREATE TABLE games (
 );
 
 CREATE TABLE ratings (
-    rating_user_id int(11) NOT NULL,
-    rating_item_type varchar(128) NOT NULL, -- film, game, show, review
-    rating_item_id int(11) NOT NULL,
-    rating_user_id int(11), -- if type = review
-    rating float(2) NOT NULL,
-    rating_like bit NOT NULL
+    `user_id` int(11) NOT NULL,
+    `item_type` varchar(128) NOT NULL, -- film, game, show, review
+    `item_id` int(11) NOT NULL,
+    `user_id` int(11), -- if type = review
+    `rating` float(2) NOT NULL,
+    `like` bit NOT NULL
 );
 
 CREATE TABLE reviews (
@@ -112,7 +112,7 @@ CREATE TABLE reviews (
     review_date datetime NOT NULL
 );
 
-CREATE TABLE diary_entries (
+CREATE TABLE entries (
     entry_user_id int(11) NOT NULL,
     entry_item_type varchar(128) NOT NULL,
     entry_item_id int(11) NOT NULL,

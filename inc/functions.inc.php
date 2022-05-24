@@ -119,3 +119,6 @@ function loginUser($conn, $username, $pwd) {
         exit();
     }
 }
+
+function generatePopularWeek()
+    $sql = "SELECT * FROM `entries` WHERE `uid` = ? OR `email` = ?;";
