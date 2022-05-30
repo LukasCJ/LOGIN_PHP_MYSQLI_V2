@@ -13,7 +13,7 @@ CREATE TABLE feature_films (
     `poster_path` varchar(128) NOT NULL,
     `bg_path` varchar(128) NOT NULL,
     `description` text NOT NULL,
-    `length` time NOT NULL, -- kom på ett sätt att sätta flera olika längder för olika versioner
+    `length` varchar(128) NOT NULL, -- kom på ett sätt att sätta flera olika längder för olika versioner
     `rating` float(2) NOT NULL,
     `related` json NOT NULL, -- includes both similar and franchise
     `cast` json NOT NULL,
