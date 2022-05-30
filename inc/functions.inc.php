@@ -1,5 +1,7 @@
 <?php
 
+// SIGNUP & LOGIN
+
 function emptyInputSignup($name, $email, $username, $pwd, $pwdRe) {
     $result;
     if (empty($name) || empty($email) || empty($username) || empty($pwd) || empty($pwdRe)) {
@@ -120,5 +122,40 @@ function loginUser($conn, $username, $pwd) {
     }
 }
 
-function generatePopularWeek()
-    $sql = "SELECT * FROM `entries` WHERE `uid` = ? OR `email` = ?;";
+// RATING
+
+function rate($conn, $user_id, $item_type, $item_id, $rating){
+    // if det redan finns en rad i ratings-tablet med samma user_id, item_type & item_id så redigeras rating-kolumnen
+    // annars skapas en ny rad
+
+    $sql = "INSERT INTO `ratings` (`user_id`, `item_type`, `item_id`, `rating`, `like`) VALUES (?, ?, ?, ?, ?);";
+}
+
+function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje gång någon betygsätter saken. borde man kanske göra så att den inte börjar från början varje gång?
+    $sql = "SELECT `rating` FROM `ratings` WHERE `id` = $item_id AND `item_type` = $item_type;"; //
+    $ratings = mysqli_fetch_row($sql); // behöver jag $conn någonstans?
+    
+    foreach($ratings as $value) {
+        $sum += $value;
+    }
+    $result = $sum / sizeof($ratings);
+
+    $sql = "INSERT INTO $item_type (`rating`) VALUES (?);";
+    // execute sql
+    // skicka användaren till ställe
+    exit();
+}
+
+function popularityAllTime(){
+    //tar in hur många som sett via entries table
+    //tar in när den släpptes
+    //tar in genomsnittligt betyg (?)
+    //formel: 
+}
+
+function popularityThisWeek(){
+    //tar in hur många som sett denna veckan
+    //tar in genomsnittligt betyg för denna veckan
+    //formel:
+    //$sql = "SELECT * FROM `entries` WHERE `uid` = ? OR `email` = ?;";
+}
