@@ -13,7 +13,7 @@ CREATE TABLE feature_films (
     `poster_path` varchar(128) NOT NULL,
     `bg_path` varchar(128) NOT NULL,
     `description` text NOT NULL,
-    `length` varchar(128) NOT NULL, -- kom på ett sätt att sätta flera olika längder för olika versioner
+    `length` int(5) NOT NULL, -- kom på ett sätt att sätta flera olika längder för olika versioner
     `rating` float(2) NOT NULL,
     `related` json NOT NULL, -- includes both similar and franchise
     `cast` json NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE short_films (
     `poster_path` varchar(128) NOT NULL,
     `bg_path` varchar(128) NOT NULL,
     `description` text NOT NULL,
-    `length` time NOT NULL,
+    `length` int(5) NOT NULL,
     `rating` float(2) NOT NULL,
     `related` json NOT NULL,
     `cast` json NOT NULL,
@@ -40,7 +40,6 @@ CREATE TABLE series (
     `series_type` varchar(128) NOT NULL, -- mini or normal
     `length_seasons` int(3) NOT NULL, -- amount of seasons
     `length_episodes` int(5) NOT NULL,
-    `length_time` time NOT NULL,
     `ongoing` bit NOT NULL,
     `date_first` date NOT NULL,
     `date_last` date, -- NULL if ongoing
@@ -57,7 +56,6 @@ CREATE TABLE series_seasons (
     `number` int(4) NOT NULL,
     `series_id` varchar(128) NOT NULL,
     `length_episodes` int(5) NOT NULL,
-    `length_time` time NOT NULL,
     `date` date NOT NULL, -- if unfinished: first ep date, if finished: first ep date "-" last ep date
     `bg_path` varchar(128) NOT NULL,
     `description` varchar(128) NOT NULL,
@@ -75,7 +73,7 @@ CREATE TABLE series_episodes (
     `date` date NOT NULL,
     `bg_path` varchar(128) NOT NULL,
     `description` varchar(128) NOT NULL,
-    `length` time NOT NULL,
+    `length` int(5) NOT NULL,
     `rating` float(2) NOT NULL
 );
 
@@ -86,7 +84,7 @@ CREATE TABLE games (
     `poster_path` varchar(128) NOT NULL,
     `bg_path` varchar(128) NOT NULL,
     `description` text NOT NULL,
-    `length` time NOT NULL, -- retrieved from howlongtobeat.com
+    `avg_length` int(5) NOT NULL, -- retrieved from howlongtobeat.com
     `rating` float(2) NOT NULL,
     `related` json NOT NULL,
     `crew` json NOT NULL,
@@ -97,7 +95,6 @@ CREATE TABLE ratings (
     `user_id` int(11) NOT NULL,
     `item_type` varchar(128) NOT NULL, -- film, game, show, review
     `item_id` int(11) NOT NULL,
-    `user_id` int(11), -- if type = review
     `rating` float(2), -- mellan 1 och 5. halvpoäng funkar. om 0 => NULL, räknas inte med i avg. 
     `like` bit NOT NULL
 );

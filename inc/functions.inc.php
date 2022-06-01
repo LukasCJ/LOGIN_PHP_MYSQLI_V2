@@ -124,27 +124,51 @@ function loginUser($conn, $username, $pwd) {
 
 // RATING
 
-function rate($conn, $user_id, $item_type, $item_id, $rating){
-    // if det redan finns en rad i ratings-tablet med samma user_id, item_type & item_id så redigeras rating-kolumnen
-    // annars skapas en ny rad
-
-    $sql = "INSERT INTO `ratings` (`user_id`, `item_type`, `item_id`, `rating`, `like`) VALUES (?, ?, ?, ?, ?);";
-}
-
 function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje gång någon betygsätter saken. borde man kanske göra så att den inte börjar från början varje gång?
-    $sql = "SELECT `rating` FROM `ratings` WHERE `id` = $item_id AND `item_type` = $item_type;"; //
-    $ratings = mysqli_fetch_row($sql); // behöver jag $conn någonstans?
     
-    foreach($ratings as $value) {
-        $sum += $value;
-    }
-    $result = $sum / sizeof($ratings);
+    // skriven query för att hämta värden
+    $sql = "SELECT `rating` FROM `ratings` WHERE `id` = $item_id AND `item_type` = $item_type AND `rating` >= 1;"; //
+    
+    // utför, hämta resultat
+    $result = mysqli_query($conn, $sql);
 
-    $sql = "INSERT INTO $item_type (`rating`) VALUES (?);";
-    // execute sql
-    // skicka användaren till ställe
-    exit();
+    // fetch resulterande värden som en array, ett format vi kan använda
+    $ratings = mysqli_fetch_array($result);
+    
+    // summera ratings
+    $sum = array_sum($ratings);
+
+    // medelvärde
+    $avg = $sum / count($ratings);
+
+    // för att uppdatera avg
+    $sql = "UPDATE $item_type SET `rating` = $avg WHERE `id` = $item_id;";
+    
+    // utför
+    mysqli_query($conn, $sql);
 }
+
+function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
+
+    // vet inte om nödvändigt men försäkrar att inga felaktiga betygsättningar smiter igenom
+    if ($rating <= 0 || $ratings >= 5) {
+        // något i stil med: header("location: ../log.php?error=wronglogin");
+        exit();
+    }
+
+    // räknar antalet rader i ratings som uppfyller angivna kriterier
+    $sql = "SELECT COUNT(*) FROM `ratings` WHERE `user_id` = $user_id AND `item_type` = $item_type AND `item_id` = $item_id;";
+    
+    // bestämmer om det finns en rad som ska uppdateras eller om en ny rad ska skapas
+    if(mysqli_query($conn, $sql) >= 1){
+        $sql = "UPDATE `ratings` SET `rating` = $rating AND `like` = $like WHERE `user_id` = $user_id AND `item_type` = $item_type AND `item_id` = $item_id;";
+    } else {
+        $sql = "INSERT INTO `ratings` (`user_id`, `item_type`, `item_id`, `rating`, `like`) VALUES ($user_id, $item_type, $item_id, $rating, $like);";
+    }
+
+    mysqli_query($conn, $sql);
+}
+
 
 function popularityAllTime(){
     //tar in hur många som sett via entries table

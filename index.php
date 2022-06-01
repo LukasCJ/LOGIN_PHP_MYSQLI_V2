@@ -29,6 +29,11 @@
     }
 ?>
 
+<form>
+    <input type="text" name="search" placeholder="Search">
+    <button type="submit" name="submit-search"></button>
+</form>
+
 <section>
 <div class="section_header"><h2>Popular</h2><p>This Week</p></div>
     <ul class="content_list posters">
