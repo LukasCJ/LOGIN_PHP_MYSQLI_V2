@@ -14,10 +14,12 @@ CREATE TABLE feature_films (
     `bg_path` varchar(128) NOT NULL,
     `description` text NOT NULL,
     `length` int(5) NOT NULL, -- kom på ett sätt att sätta flera olika längder för olika versioner
-    `rating` float(2) NOT NULL,
+    `rating` float(2) NOT NULL DEFAULT 0,
     `related` json NOT NULL, -- includes both similar and franchise
     `cast` json NOT NULL,
-    `crew` json NOT NULL
+    `crew` json NOT NULL,
+    `popularity_all` int(11) NOT NULL DEFAULT 0,
+    `popularity_week` int(11) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE short_films (
@@ -65,8 +67,8 @@ CREATE TABLE series_seasons (
 );
 
 CREATE TABLE series_episodes (
-    `number_season` int(5) NOT NULL, -- which episode is it of entire series?
-    `number_series` int(5) NOT NULL, -- which episode is it of this season?
+    `number_season` int(5) NOT NULL, -- which episode is it of this season?
+    `number_series` int(5) NOT NULL, -- which episode is it of entire series?
     `series_id` varchar(128) NOT NULL,
     `season` varchar(128) NOT NULL,
     `name` varchar(128) NOT NULL,

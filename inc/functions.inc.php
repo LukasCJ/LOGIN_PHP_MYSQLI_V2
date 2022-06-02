@@ -127,7 +127,7 @@ function loginUser($conn, $username, $pwd) {
 function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje gång någon betygsätter saken. borde man kanske göra så att den inte börjar från början varje gång?
     
     // skriven query för att hämta värden
-    $sql = "SELECT `rating` FROM `ratings` WHERE `id` = $item_id AND `item_type` = $item_type AND `rating` >= 1;"; //
+    $sql = "SELECT `rating` FROM `ratings` WHERE `id` = $item_id AND `item_type` = $item_type AND `rating` >= 1;";
     
     // utför, hämta resultat
     $result = mysqli_query($conn, $sql);
@@ -151,35 +151,76 @@ function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje g
 function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
 
     // vet inte om nödvändigt men försäkrar att inga felaktiga betygsättningar smiter igenom
-    if ($rating <= 0 || $ratings >= 5) {
+    if ($rating <= 0 || $rating >= 5) {
         // något i stil med: header("location: ../log.php?error=wronglogin");
         exit();
     }
 
     // räknar antalet rader i ratings som uppfyller angivna kriterier
-    $sql = "SELECT COUNT(*) FROM `ratings` WHERE `user_id` = $user_id AND `item_type` = $item_type AND `item_id` = $item_id;";
+    $sql = "SELECT * FROM `ratings` WHERE `user_id` = $user_id AND `item_type` = $item_type AND `item_id` = $item_id;";
     
+    $result = mysqli_query($conn, $sql);
+
     // bestämmer om det finns en rad som ska uppdateras eller om en ny rad ska skapas
-    if(mysqli_query($conn, $sql) >= 1){
-        $sql = "UPDATE `ratings` SET `rating` = $rating AND `like` = $like WHERE `user_id` = $user_id AND `item_type` = $item_type AND `item_id` = $item_id;";
+    if(mysqli_fetch_array($conn, $sql)){
+        $sql = "UPDATE `ratings` SET `rating` = ? AND `like` = ? WHERE `user_id` = ? AND `item_type` = ? AND `item_id` = ?;";
     } else {
-        $sql = "INSERT INTO `ratings` (`user_id`, `item_type`, `item_id`, `rating`, `like`) VALUES ($user_id, $item_type, $item_id, $rating, $like);";
+        $sql = "INSERT INTO `ratings` (`rating`, `like`, `user_id`, `item_type`, `item_id`) VALUES (?, ?, ?, ?, ?);";
     }
 
+    // initierar mysql statement
+    $stmt = mysqli_stmt_init($conn);
+    // används för att hindra sql injection
+    // behövs främst vid användning av input-fält
+    // används i denna funktion ifall input-fält används för att betygsätta
+
+    // förbereder statement, samt kollar om något går fel. innebär i princip att query:n skickas till databasen i förväg för att hindra injection
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        //header("location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    // binder variabler till query:n
+    mysqli_stmt_bind_param($stmt, "diisi", $rating, $like, $user_id, $item_type, $item_id);
+    // "diisi" innebär datatyperna på de insatta variablerna -- double, integer, integer, string, integer
+
+    // utför
+    mysqli_stmt_execute($stmt);
+
+    // stänger statement
+    mysqli_stmt_close($stmt);
+}
+
+
+function popularityAllTime($conn, $item_type, $item_id){
+    
+    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = $item_type;";
+
+    $result = mysqli_query($conn, $sql);
+
+    $array = mysqli_fetch_array($result);
+    $value = intval($array[0]);
+
+    $sql = "UPDATE $item_type SET `popularity_all` = $value WHERE `item_id` = $item_id;";
+    
     mysqli_query($conn, $sql);
 }
 
+function popularityThisWeek($conn, $item_type, $item_id){
 
-function popularityAllTime(){
-    //tar in hur många som sett via entries table
-    //tar in när den släpptes
-    //tar in genomsnittligt betyg (?)
-    //formel: 
-}
+    // hämtar tiden för en vecka sedan och gör till passande format
+    $tmp = strtotime("-1 Week")
+    $date_lim = date("Y-m-d H:i:s", $tmp)
+    // hur fixar man för tidszoner?
 
-function popularityThisWeek(){
-    //tar in hur många som sett denna veckan
-    //tar in genomsnittligt betyg för denna veckan
-    //formel:
-    //$sql = "SELECT * FROM `entries` WHERE `uid` = ? OR `email` = ?;";
+    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = $item_type AND `date_completion` >= $date_lim;";
+
+    $result = mysqli_query($conn, $sql);
+
+    $array = mysqli_fetch_array($result);
+    $value = intval($array[0]);
+
+    $sql = "UPDATE $item_type SET `popularity_week` = $value WHERE `item_id` = $item_id;";
+    
+    mysqli_query($conn, $sql);
 }
