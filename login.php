@@ -1,26 +1,20 @@
 <?php include_once 'header.php'; ?>
 
 <section>
-    <div class="section_header"><h2>Log In</h2></div>
-    <div class="section_main">
-        <form action="inc/login.inc.php" method="post">
-            <input type="text" name="uid" placeholder="Username/Email...">
-            <input type="password" name="pwd" placeholder="Password..">
-            <button type="submit" name="submit"><p>Log In</p></button>
-        </form>
 
-        <?php
-            if (isset($_GET["error"])) {
-                if ($_GET["error"] == "emptyinput") {
-                    echo '<p>Fill in all fields</p>';
-                }
-                else if ($_GET["error"] == "wronglogin") {
-                    echo '<p>Invalid input</p>';
-                }
-            }
-        ?>
+    <div class="sub_header"><h2>Log In</h2></div>
 
-    </div>
+    <ul id="form_choice">
+        <li><a href="login_temp.html" class="button">Log in</a></li>
+        <li><a href="signup_temp.html" class="button">Sign up</a></li>
+    </ul>
+
+    <form action="inc/login.inc.php" method="post" id="login_form">
+        <input type="text" name="uid" placeholder="Username/Email...">
+        <input type="password" name="pwd" placeholder="Password...">
+        <button type="submit" name="submit" class="button">Log In</button>
+    </form>
+
 </section>
 
 <?php include_once 'footer.php' ?>

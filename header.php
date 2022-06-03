@@ -1,7 +1,3 @@
-<?php
-    session_start();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,28 +10,35 @@
 
 <body>
 
-    <div id="grid_wrapper">
+    <header>
 
-        <header>
-            <nav>
-                <a href="index.php" id="nav_logo"><img src="img/logo.png" alt="website logo"></a>
-                <ul>
-                    <?php
-                        if (isset($_SESSION["useruid"])) {
-                            echo '<li class="nav_item"><a href="#"><p>Log</p></a></li>';
-                        }
-                    ?>
-                    <li class="nav_item"><a href="#"><p>Browse</p></a></li>
-                    <?php
-                        if (isset($_SESSION["useruid"])) {
-                            echo '<li class="nav_item"><a href="profile.php"><p>Profile</p></a></li>';
-                            echo '<li class="nav_item"><a href="inc/logout.inc.php"><p>Log Out</p></a></li>';
-                        }
-                        else {
-                            echo '<li class="nav_item"><a href="signup.php"><p>Sign up</p></a></li>';
-                            echo '<li class="nav_item"><a href="login.php"><p>Log in</p></a></li>';
-                        }
-                    ?>
-                </ul>
-            </nav>
-        </header>
+        <a href="index.php" class="logo">
+            <img src="" alt="Website Logo">
+        </a>
+
+        <nav>
+            <?php
+                if (isset($_SESSION["useruid"])) {
+                    echo '<button class="button" type="button" name="init_log">Log</button>';
+                }
+            ?>
+            <a href="#" class="button">Browse</a>
+            <?php
+                if (isset($_SESSION["useruid"])) {
+                    echo '<a href="profile.php" class="button">Profile</a>';
+                }
+            ?>
+            <form id="search_form">
+                <input type="text" name="search" placeholder="Search">
+                <button class="button" type="submit" name="submit_search">Search</button>
+            </form>
+            <?php
+                if (isset($_SESSION["useruid"])) {
+                    echo '<a href="inc/logout.inc.php" class="button">Log Out</a>';
+                } else {
+                    echo '<a href="login.php" class="button">Log in</a>';
+                }
+            ?>
+        </nav>
+
+    </header>

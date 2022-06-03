@@ -1,61 +1,33 @@
-<?php include_once 'header.php'; ?>
+<?php 
 
-<?php
-    if (isset($_SESSION["useruid"])) {
-        echo '<h2>Welcome ' . $_SESSION["useruid"] . '</h2>';
-        echo '<section>
-            <div class="section_header"><h2>Recent Activity</h2><p>From Friends</p></div>
-            <ul class="content_list posters">
-            <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster_2.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-                <li class="poster_container final"><a href="#">
-                    <p class="sm-plus">+</p>
-                    <p>Show More</p>
-                </a></li>
-            </ul>
-        </section>';
-    }
+require_once 'inc/dbh.inc.php';
+require_once 'inc/functions.inc.php';
+
+include_once 'header.php';
+
+if (isset($_SESSION["useruid"])) {
+    include_once 'list_recent.php';
+} 
+
 ?>
 
-<form>
-    <input type="text" name="search" placeholder="Search">
-    <button type="submit" name="submit-search"></button>
-</form>
-
 <section>
-<div class="section_header"><h2>Popular</h2><p>This Week</p></div>
-    <ul class="content_list posters">
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster_2.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container"><a href="#"><img src="img/metadata/poster.jpg" alt="poster"></a></li>
-        <li class="poster_container final"><a href="#">
-            <p class="sm-plus">+</p>
-            <p>Show More</p>
-        </a></li>
-    </ul>
+
+    <div class="sub_header">
+        <h2>Popular</h2>
+        <p>This Week</p>
+    </div>
+
+    <div class="poster_list horizontal">
+        <?php $row = retrieveMostPopular($conn, 15);
+        
+        foreach($row as $item): ?>
+            <a href="item.php?type=<?php echo $item['type'] ?>?id=<?php echo $item['id'] ?>" class="poster_container"><img src=<?php echo $item['poster_path'] ?> alt="Poster"></a>
+        <?php endforeach; ?>
+        <a href="#" class="poster_container"><img src="" alt="Poster"></a>
+        <a href="#" class="poster_container show_more"><div><h3>Show More</h3></div></a>
+    </div>
+
 </section>
 
 <?php include_once 'footer.php' ?>

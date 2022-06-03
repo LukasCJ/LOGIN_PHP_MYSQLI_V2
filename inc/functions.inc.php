@@ -47,8 +47,8 @@ function pwdMatch($pwd, $pwdRe) {
 }
 
 function uidExists($conn, $username, $email) {
-    $sql = "SELECT * FROM `users` WHERE `uid` = ? OR `email` = ?;"; //checks whether either username or email are taken; checks wether they already exists in the "users" table
-    $stmt = mysqli_stmt_init($conn); //prevents visitors from damaging the website by writing stuff in the input-fields. explained at 1:10:30 in the video
+    $sql = "SELECT * FROM `users` WHERE `uid` = ? OR `email` = ?;";
+    $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
         header("location: ../signup.php?error=stmtfailed");
         exit();
@@ -99,7 +99,7 @@ function emptyInputLogin($username, $pwd) {
 }
 
 function loginUser($conn, $username, $pwd) {
-    $uidExists = uidExists($conn, $username, $username); //the variable username works for both email and username, which is why it is included twice
+    $uidExists = uidExists($conn, $username, $username);
 
     if ($uidExists === false) {
         header("location: ../login.php?error=wronglogin");
@@ -132,7 +132,7 @@ function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje g
     // utför, hämta resultat
     $result = mysqli_query($conn, $sql);
 
-    // fetch resulterande värden som en array, ett format vi kan använda
+    // fetch:ar resulterande värden som en array, ett format vi kan använda
     $ratings = mysqli_fetch_array($result);
     
     // summera ratings
@@ -191,7 +191,6 @@ function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
     mysqli_stmt_close($stmt);
 }
 
-
 function popularityAllTime($conn, $item_type, $item_id){
     
     $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = $item_type;";
@@ -223,4 +222,37 @@ function popularityThisWeek($conn, $item_type, $item_id){
     $sql = "UPDATE $item_type SET `popularity_week` = $value WHERE `item_id` = $item_id;";
     
     mysqli_query($conn, $sql);
+}
+
+function retrieveMostPopular($conn, $lim){
+
+    $sql = "SELECT * FROM `feature_films` ORDER BY `popularity_week` DESC LIMIT $lim;";
+    $result = mysqli_query($conn, $sql);
+    $row_films = mysqli_fetch_assoc($result);
+
+    $sql = "SELECT * FROM `series` ORDER BY `popularity_week` DESC LIMIT $lim;";
+    $result = mysqli_query($conn, $sql);
+    $row_series = mysqli_fetch_assoc($result);
+
+    $sql = "SELECT * FROM `games` ORDER BY `popularity_week` DESC LIMIT $lim;";
+    $result = mysqli_query($conn, $sql);
+    $row_games = mysqli_fetch_assoc($result);
+
+    // append arrays
+    $row_full = array_merge($row_films, $row_series, $row_games)
+
+    // kollar om 'popularity_week' för det första array-elementet är mindre än det för det andra
+    function sortByPopularity($a, $b) {
+        return $a['popularity_week'] < $b['popularity_week'];
+    }
+
+    // sorterar med hjälp av funktionen ovan
+    usort($row_full, 'sortByPopularity');
+
+    // tar successivt bort sista elementet i listan tills efterfrågad mängd återstår
+    while (count($row_full) > $lim) {
+        array_pop($row_full)
+    }
+
+    return $row_full
 }
