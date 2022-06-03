@@ -1,3 +1,7 @@
+<?php
+    session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +34,7 @@
             ?>
             <form action="inc/search.inc.php" method="post" id="search_form">
                 <input type="text" name="search" placeholder="Search">
-                <button class="button" type="submit" name="submit_search">Search</button>
+                <button class="button" type="submit" name="submit-search">Search</button>
             </form>
             <?php
                 if (isset($_SESSION["useruid"])) {

@@ -148,13 +148,18 @@ function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje g
     mysqli_query($conn, $sql);
 }
 
-function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
-
-    // vet inte om nödvändigt men försäkrar att inga felaktiga betygsättningar smiter igenom
-    if ($rating <= 0 || $rating >= 5) {
-        // något i stil med: header("location: ../log.php?error=wronglogin");
-        exit();
+function invalidRating($rating){
+    $result = true
+    while ($result && $i >= 0.1 && $i <= 5) { // vi vill bara tillåta tal med en decimal och mellan 0.1 och 5
+        if ($rating == $i){
+            $result = false
+        }
+        $i += 0.1
     }
+    return $result
+}
+
+function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
 
     // räknar antalet rader i ratings som uppfyller angivna kriterier
     $sql = "SELECT * FROM `ratings` WHERE `user_id` = $user_id AND `item_type` = $item_type AND `item_id` = $item_id;";

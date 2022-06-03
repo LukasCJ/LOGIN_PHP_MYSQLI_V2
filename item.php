@@ -1,31 +1,28 @@
 <?php 
+    include_once 'header.php';
+    require_once 'inc/dbh.inc.php';
 
-    include_once('inc/dbh.php')
+    // hindrar skadliga strängar i get-metoden?
+    $type = mysqli_real_escape_string($conn, $_GET['type'])
+    $id = mysqli_real_escape_string($conn, $_GET['id'])
 
-    if(isset($_GET['type'] && isset($_GET['id'])){
+    $sql = "SELECT * FROM `items` WHERE `type` = $type AND `id` = $id"
 
-        // ?hindrar skadliga strängar i get-metoden?
-        $type = mysqli_real_escape_string($conn, $_GET['type'])
-        $id = mysqli_real_escape_string($conn, $_GET['id'])
+    $result = mysqli_query($conn, $sql);
 
-        $sql = "SELECT * FROM `items` WHERE `type` = $type AND `id` = $id"
-
-        $result = mysqli_query($conn, $sql);
-
-        $item = mysqli_fetch_assoc($result);
-    }
+    $item = mysqli_fetch_assoc($result);
 ?>
 
 <form action="inc/log.inc.php" method="post" id="log_overlay">
     <div class="overlay_box">
         <div class="rate_wrapper">
             <div class="poster_container"><img src="img/metadata/poster.jpg" alt="Poster"></div>
-            <div><h3>Parasite<br>(2019)</h3></div>
+            <div><?php echo htmlspecialchars($item['name']); ?><br>(<?php echo htmlspecialchars(date('Y', strtotime($item['date']))); ?>)</h3></div>
         </div>
         <input type="number" name="rating" min="1" max="5" step="0.1" placeholder="Rate">
         <input type="date" name="date">
     </div>
-    <button class="button" type="submit" name="finish_log">Confirm</button>
+    <button class="button" type="submit" name="submit">Confirm</button>
     <button class="button" type="button" name="close_log" onclick="deactivateOverlay()">Cancel</button>
 </form>
 
@@ -47,4 +44,4 @@
     <?php endif; ?>
 </section>
 
-<?php include_once 'header.php'; ?>
+<?php include_once 'footer.php'; ?>

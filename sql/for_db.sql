@@ -8,7 +8,7 @@ CREATE TABLE users (
 
 CREATE TABLE items {
     -- universella:
-    `type` varchar(128) NOT NULL CHECK (`type` IN ('Film', 'Short Film', 'Game', 'Series', 'Mini Series')), -- Film, Short Film, Game, Series, Mini Series
+    `type` varchar(128) NOT NULL CHECK (`type` IN ('Film', 'Short Film', 'Game', 'Series', 'Mini Series')), -- Film, ShortFilm, Game, Series, MiniSeries
     `id` int(11) NOT NULL,
     `name` varchar(128) NOT NULL,
     `date` date NOT NULL,

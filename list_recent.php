@@ -17,10 +17,7 @@
                     <p>Name</p>
                 </div>
                 <div>
-                    <p>Rating</p>
-                    <div class="icon star"></div>
-                    <div class="icon star"></div>
-                    <div class="icon star"></div>
+                    <p>Rating: 4</p>
                 </div>
             </div>
             
