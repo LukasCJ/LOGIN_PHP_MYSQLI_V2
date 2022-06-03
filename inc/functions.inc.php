@@ -61,7 +61,7 @@ function uidExists($conn, $username, $email) {
 
     if ($row = mysqli_fetch_assoc($resultData)) {
         return $row;
-    }
+    } 
     else {
         $result = false;
         return $result;
@@ -112,8 +112,7 @@ function loginUser($conn, $username, $pwd) {
     if ($checkPwd === false) {
         header("location: ../login.php?error=wronglogin");
         exit();
-    }
-    else if ($checkPwd === true) {
+    } else if ($checkPwd === true) {
         session_start();
         $_SESSION["userid"] = $uidExists["id"];
         $_SESSION["useruid"] = $uidExists["uid"];
@@ -127,7 +126,7 @@ function loginUser($conn, $username, $pwd) {
 function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje gång någon betygsätter saken. borde man kanske göra så att den inte börjar från början varje gång?
     
     // skriven query för att hämta värden
-    $sql = "SELECT `rating` FROM `ratings` WHERE `id` = $item_id AND `item_type` = $item_type AND `rating` >= 1;";
+    $sql = "SELECT `rating` FROM `ratings` WHERE `item_id` = $item_id AND `item_type` = $item_type AND `rating` >= 0.1;";
     
     // utför, hämta resultat
     $result = mysqli_query($conn, $sql);
@@ -142,21 +141,30 @@ function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje g
     $avg = $sum / count($ratings);
 
     // för att uppdatera avg
-    $sql = "UPDATE $item_type SET `rating` = $avg WHERE `id` = $item_id;";
+    $sql = "UPDATE `items` SET `rating` = $avg WHERE `type` = '$item_type' AND `id` = $item_id;";
     
     // utför
     mysqli_query($conn, $sql);
 }
 
-function invalidRating($rating){
-    $result = true
-    while ($result && $i >= 0.1 && $i <= 5) { // vi vill bara tillåta tal med en decimal och mellan 0.1 och 5
-        if ($rating == $i){
-            $result = false
+function invalidRating($rating) {
+
+    $result = true;
+    $i = 0.1;
+
+    while($result && $i <= 5) { // vi vill bara tillåta tal med en decimal och mellan 0.1 och 5
+
+        if($rating == $i) {
+
+            $result = false;
+
         }
-        $i += 0.1
+
+        $i += 0.1;
+
     }
-    return $result
+
+    return $result;
 }
 
 function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
@@ -198,57 +206,69 @@ function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
 
 function popularityAllTime($conn, $item_type, $item_id){
     
-    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = $item_type;";
+    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = '$item_type';";
 
     $result = mysqli_query($conn, $sql);
 
     $array = mysqli_fetch_array($result);
     $value = intval($array[0]);
 
-    $sql = "UPDATE $item_type SET `popularity_all` = $value WHERE `item_id` = $item_id;";
+    $sql = "UPDATE `items` SET `popularity_all` = $value WHERE `type` = '$item_type' AND `id` = $item_id;";
     
     mysqli_query($conn, $sql);
 }
 
-function popularityThisWeek($conn, $item_type, $item_id){
+function popularityThisWeek($conn, $item_type, $item_id) {
 
     // hämtar tiden för en vecka sedan och gör till passande format
-    $tmp = strtotime("-1 Week")
-    $date_lim = date("Y-m-d H:i:s", $tmp)
+    $tmp = strtotime("-1 Week");
+    $date_lim = date("Y-m-d H:i:s", $tmp);
     // hur fixar man för tidszoner?
 
-    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = $item_type AND `date_completion` >= $date_lim;";
+    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = '$item_type' AND `date_completion` >= '$date_lim';";
 
     $result = mysqli_query($conn, $sql);
 
     $array = mysqli_fetch_array($result);
     $value = intval($array[0]);
 
-    $sql = "UPDATE `items` SET `popularity_week` = $value WHERE `type` = $item_type AND `id` = $item_id;";
+    $sql = "UPDATE `items` SET `popularity_week` = $value WHERE `type` = '$item_type' AND `id` = $item_id;";
     
     mysqli_query($conn, $sql);
 }
 
-function retrieveSortedList($conn, $item_type, $factor, $order, $lim){
+function retrieveSortedList($conn, $item_type, $factor, $order, $lim) {
     
-    if($order == "asc") {
-        if($item_type == "any") {
-            $sql = "SELECT * FROM `items` ORDER BY $factor ASC LIMIT $lim;";
+    if ($order == "asc") {
+
+        if($item_type == "*") {
+
+            $sql = "SELECT * FROM `items` ORDER BY '$factor' ASC LIMIT $lim;";
+
         } else {
-            $sql = "SELECT * FROM `items` WHERE `type` = $item_type ORDER BY $factor ASC LIMIT $lim;";
+
+            $sql = "SELECT * FROM `items` WHERE `type` = '$item_type' ORDER BY '$factor' ASC LIMIT $lim;";
+
         }
-    } else if($order == "desc") {
-        if($item_type == "any") {
-            $sql = "SELECT * FROM `items` ORDER BY $factor DESC LIMIT $lim;";
+
+    } else if ($order == "desc") {
+
+        if ($item_type == "*") {
+
+            $sql = "SELECT * FROM `items` ORDER BY '$factor' DESC LIMIT $lim;";
+
         } else {
-            $sql = "SELECT * FROM `items` WHERE `type` = $item_type ORDER BY $factor DESC LIMIT $lim;";
+        
+            $sql = "SELECT * FROM `items` WHERE `type` = '$item_type' ORDER BY '$factor' DESC LIMIT $lim;";
+
         }
     }
 
     $result = mysqli_query($conn, $sql);
-    $items = mysqli_fetch_assoc($result);
 
-    return $items
+    $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    return $items;
 }
 
 function createEntry($conn, $rating, $like, $user_id, $item_type, $item_id, $re, $date_completion, $date_first){

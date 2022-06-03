@@ -5,8 +5,8 @@
     <div class="sub_header"><h2>Log In</h2></div>
 
     <ul id="form_choice">
-        <li><a href="login_temp.html" class="button">Log in</a></li>
-        <li><a href="signup_temp.html" class="button">Sign up</a></li>
+        <li><a href="login.php" class="button">Log in</a></li>
+        <li><a href="signup.php" class="button">Sign up</a></li>
     </ul>
 
     <form action="inc/login.inc.php" method="post" id="login_form">

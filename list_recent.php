@@ -18,6 +18,7 @@
                 </div>
                 <div>
                     <p>Rating: 4</p>
+                    <div class="icon star"></div>
                 </div>
             </div>
             

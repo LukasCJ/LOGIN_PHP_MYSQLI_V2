@@ -15,7 +15,7 @@ body {
 
     --border-radius: 3px;
 
-    --poster-w1: 6.2rem;
+    --poster-w1: 6.8rem;
     --poster-h1: calc(var(--poster-w1)*1.5);
     --poster-w2: 4rem;
     --poster-h2: calc(var(--poster-w2)*1.5);
@@ -123,8 +123,8 @@ nav {
 
 .icon.star {
     background-color: var(--color1);
-    -webkit-mask: url(icon/star.svg) no-repeat center;
-    mask: url(icon/star.svg) no-repeat center;
+    -webkit-mask: url(../icon/star.svg) no-repeat center;
+    mask: url(../icon/star.svg) no-repeat center;
 }
 
 .sub_header {
@@ -138,6 +138,11 @@ nav {
     
     border-top: 1px solid var(--color2);
     border-bottom: 1px solid var(--color2);
+}
+
+.sub_header p {
+    font-family: var(--font1); 
+    color: var(--color2);
 }
 
 .poster_list.horizontal {
@@ -160,6 +165,7 @@ nav {
 
     border-radius: var(--border-radius);
     border: 1px solid var(--color2);
+    overflow: hidden;
 }
 
 .poster_container > :first-child { width: var(--poster-w1); height: var(--poster-h1); }
@@ -169,8 +175,8 @@ nav {
     height: max-content;
 }
 
-.activity_info > div { width: var(--poster-w1); height: calc(var(--poster-h1)/6); display: flex; background-color: red; }
-.activity_info > div:nth-child(2) { background-color: green;}
+.activity_info > div { width: var(--poster-w1); height: calc(var(--poster-h1)/6); display: flex; }
+.activity_info > div:first-child { border-top: 1px solid var(--color1); }
 
 ::-webkit-scrollbar { width: var(--scrollbar-w); }
 ::-webkit-scrollbar-track { background-color: transparent; }

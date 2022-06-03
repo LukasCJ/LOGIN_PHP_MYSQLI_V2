@@ -1,5 +1,6 @@
-<?php
+<?php 
     session_start();
+    include_once 'inc/dbh.inc.php'; 
 ?>
 
 <!DOCTYPE html>
@@ -21,12 +22,7 @@
         </a>
 
         <nav>
-            <?php
-                if (isset($_SESSION["useruid"])) {
-                    echo '<button class="button" type="button" name="init_log">Log</button>';
-                }
-            ?>
-            <a href="#" class="button">Browse</a>
+            <a href="browse.php" class="button">Browse</a>
             <?php
                 if (isset($_SESSION["useruid"])) {
                     echo '<a href="profile.php" class="button">Profile</a>';

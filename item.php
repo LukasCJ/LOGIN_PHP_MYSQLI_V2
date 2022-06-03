@@ -1,16 +1,21 @@
 <?php 
-    include_once 'header.php';
-    require_once 'inc/dbh.inc.php';
+    include 'header.php';
 
-    // hindrar skadliga strängar i get-metoden?
-    $type = mysqli_real_escape_string($conn, $_GET['type'])
-    $id = mysqli_real_escape_string($conn, $_GET['id'])
+    // real_escape_string hindrar skadliga strängar i get-metoden
+    $type = mysqli_real_escape_string($conn, $_GET['type']);
+    $id = mysqli_real_escape_string($conn, $_GET['id']);
 
-    $sql = "SELECT * FROM `items` WHERE `type` = $type AND `id` = $id"
+    $sql = "SELECT * FROM `items` WHERE `type` = '$type' AND `id` = $id";
 
     $result = mysqli_query($conn, $sql);
 
     $item = mysqli_fetch_assoc($result);
+
+    mysqli_free_result($result);
+
+    mysqli_close($conn);
+
+    if (isset($_SESSION["useruid"])):
 ?>
 
 <form action="inc/log.inc.php" method="post" id="log_overlay">
@@ -26,6 +31,8 @@
     <button class="button" type="button" name="close_log" onclick="deactivateOverlay()">Cancel</button>
 </form>
 
+<?php endif; ?>
+
 <section>
     <?php if($item): ?>
         <div class="sub_header">    
@@ -36,7 +43,9 @@
             <div class="poster_container"><img src=<?php echo $item['poster_path']; ?> alt="Poster"></div>
             <div class="score_container"><?php echo htmlspecialchars($item['rating']); ?></div>
         </div>
-        <button class="button" type="button" name="init_log" onclick="activateOverlay()">Rate</button>
+        <?php if (isset($_SESSION["useruid"])) {
+            echo '<button class="button" type="button" name="init_log" onclick="activateOverlay()">Rate</button>';
+        } ?>
     <?php else: ?>
         <div class="sub_header">    
             <h2>Something went wrong.</h2>

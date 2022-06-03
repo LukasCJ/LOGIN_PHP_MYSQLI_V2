@@ -6,7 +6,7 @@ CREATE TABLE users (
     `pwd` varchar(128) NOT NULL
 );
 
-CREATE TABLE items {
+CREATE TABLE items (
     -- universella:
     `type` varchar(128) NOT NULL CHECK (`type` IN ('Film', 'Short Film', 'Game', 'Series', 'Mini Series')), -- Film, ShortFilm, Game, Series, MiniSeries
     `id` int(11) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE items {
     `description` text NOT NULL,
     `rating` float(2) NOT NULL DEFAULT 0,
     `popularity_all` int(11) NOT NULL DEFAULT 0,
-    `popularity_week` int(11) NOT NULL DEFAULT 0
+    `popularity_week` int(11) NOT NULL DEFAULT 0,
 
     -- `related` json NOT NULL, -- inkluderar både items i samma franchise och liknande items
     -- `cast` json NOT NULL,
@@ -28,8 +28,8 @@ CREATE TABLE items {
     `series_length_seasons` int(3),
     `series_length_eps` int(5),
     `series_ongoing` bit, -- 1: yes
-    `series_date_last` date, -- NULL if ongoing
-}
+    `series_date_last` date -- NULL if ongoing
+);
 
 CREATE TABLE seasons (
     `number` int(4) NOT NULL,

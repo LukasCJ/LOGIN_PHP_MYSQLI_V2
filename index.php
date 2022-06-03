@@ -1,16 +1,19 @@
-<?php 
-
-require_once 'inc/dbh.inc.php';
-require_once 'inc/functions.inc.php';
-
-include_once 'header.php';
+<?php include_once 'header.php';
 
 if (isset($_SESSION["useruid"])){
     include_once 'list_recent.php';
 } 
 
-$items = retrieveSortedList($conn, "any", "popularity_week", "desc", 14);
+$sql = "SELECT * FROM `items` ORDER BY `popularity_week` DESC LIMIT 7;";
 
+$result = mysqli_query($conn, $sql);
+
+// multi-dimensionell, associativ array
+$items = mysqli_fetch_all($result, MYSQLI_ASSOC); 
+
+mysqli_free_result($result);
+
+mysqli_close($conn);
 ?>
 
 <section>
@@ -23,7 +26,7 @@ $items = retrieveSortedList($conn, "any", "popularity_week", "desc", 14);
     <div class="poster_list horizontal">
         <?php 
             foreach($items as $item){
-                echo '<a href="item.php?type='.$item['type'].'&id='.$item['id'].'" class="poster_container"><img src='.$item['poster_path'].' alt="Poster"></a>'
+                echo "<a href='item.php?type=".$item['type']."&id=".$item['id']."' class='poster_container'><img src='".$item['poster_path']."' alt='Poster'></a>";
             }
         ?>
         <a href="#" class="poster_container show_more"><div><h3>Show More</h3></div></a>
