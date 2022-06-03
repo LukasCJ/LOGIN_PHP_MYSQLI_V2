@@ -8,7 +8,7 @@ CREATE TABLE users (
 
 CREATE TABLE items {
     -- universella:
-    `type` varchar(128) NOT NULL, -- film, short film, game, show, season, episode
+    `type` varchar(128) NOT NULL CHECK (`type` IN ('Film', 'Short Film', 'Game', 'Series', 'Mini Series')), -- Film, Short Film, Game, Series, Mini Series
     `id` int(11) NOT NULL,
     `name` varchar(128) NOT NULL,
     `date` date NOT NULL,
@@ -19,19 +19,16 @@ CREATE TABLE items {
     `popularity_all` int(11) NOT NULL DEFAULT 0,
     `popularity_week` int(11) NOT NULL DEFAULT 0
 
-    -- `related` json NOT NULL, -- inkluderar både franchise och liknande
+    -- `related` json NOT NULL, -- inkluderar både items i samma franchise och liknande items
     -- `cast` json NOT NULL,
     -- `crew` json NOT NULL,
 
-    `film_length` int(5), -- i minuter
+    `length` int(5), -- för spel och filmer, i minuter. spels längd hämtad från howlongtobeat.com
 
     `series_length_seasons` int(3),
     `series_length_eps` int(5),
-    `series_type` varchar(1), -- R: regular, M: mini
-    `series_ongoing` bit,
+    `series_ongoing` bit, -- 1: yes
     `series_date_last` date, -- NULL if ongoing
-
-    `game_avg_length` int(5), -- hämtad från howlongtobeat.com
 }
 
 CREATE TABLE seasons (
@@ -70,9 +67,10 @@ CREATE TABLE entries (
     `item_id` int(11) NOT NULL,
     `rating` float(2) NOT NULL,
     `like` bit NOT NULL,
-    `review` bit NOT NULL,
-    `review_id` int(11),
-    `date_completion` datetime NOT NULL, -- datetime för att lättare sortera i "activity from friends"
+    `date_completion` date NOT NULL,
     `date_start` date, -- optional
-    `first` bit -- is it a rewatch?
+    `re` bit NOT NULL DEFAULT 0 -- is it a rewatch? 1: yes
+
+    -- `review` bit NOT NULL,
+    -- `review_id` int(11),
 );

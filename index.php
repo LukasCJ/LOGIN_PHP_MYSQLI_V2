@@ -9,6 +9,8 @@ if (isset($_SESSION["useruid"])) {
     include_once 'list_recent.php';
 } 
 
+$items = retrieveSortedList($conn, "any", "popularity_week", "desc", 15);
+
 ?>
 
 <section>
@@ -19,10 +21,8 @@ if (isset($_SESSION["useruid"])) {
     </div>
 
     <div class="poster_list horizontal">
-        <?php $row = retrieveMostPopular($conn, 15);
-        
-        foreach($row as $item): ?>
-            <a href="item.php?type=<?php echo $item['type'] ?>?id=<?php echo $item['id'] ?>" class="poster_container"><img src=<?php echo $item['poster_path'] ?> alt="Poster"></a>
+        <?php foreach($items as $item): ?>
+        <a href="item.php?type=<?php echo $item['type']; ?>?id=<?php echo $item['id']; ?>" class="poster_container"><img src="<?php echo $item['poster_path']; ?>" alt="Poster"></a>
         <?php endforeach; ?>
         <a href="#" class="poster_container"><img src="" alt="Poster"></a>
         <a href="#" class="poster_container show_more"><div><h3>Show More</h3></div></a>

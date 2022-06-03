@@ -36,6 +36,6 @@ if (isset($_POST["submit"])) {
 
 }
 else {
-    header("location: ../signup.php"); //send user back to signup.php
+    header("location: ../signup.php");
     exit();
 }

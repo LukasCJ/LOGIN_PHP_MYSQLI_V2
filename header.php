@@ -28,7 +28,7 @@
                     echo '<a href="profile.php" class="button">Profile</a>';
                 }
             ?>
-            <form id="search_form">
+            <form action="inc/search.inc.php" method="post" id="search_form">
                 <input type="text" name="search" placeholder="Search">
                 <button class="button" type="submit" name="submit_search">Search</button>
             </form>

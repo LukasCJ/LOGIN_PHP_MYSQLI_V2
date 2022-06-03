@@ -219,40 +219,53 @@ function popularityThisWeek($conn, $item_type, $item_id){
     $array = mysqli_fetch_array($result);
     $value = intval($array[0]);
 
-    $sql = "UPDATE $item_type SET `popularity_week` = $value WHERE `item_id` = $item_id;";
+    $sql = "UPDATE `items` SET `popularity_week` = $value WHERE `type` = $item_type AND `id` = $item_id;";
     
     mysqli_query($conn, $sql);
 }
 
-function retrieveMostPopular($conn, $lim){
-
-    $sql = "SELECT * FROM `feature_films` ORDER BY `popularity_week` DESC LIMIT $lim;";
-    $result = mysqli_query($conn, $sql);
-    $row_films = mysqli_fetch_assoc($result);
-
-    $sql = "SELECT * FROM `series` ORDER BY `popularity_week` DESC LIMIT $lim;";
-    $result = mysqli_query($conn, $sql);
-    $row_series = mysqli_fetch_assoc($result);
-
-    $sql = "SELECT * FROM `games` ORDER BY `popularity_week` DESC LIMIT $lim;";
-    $result = mysqli_query($conn, $sql);
-    $row_games = mysqli_fetch_assoc($result);
-
-    // append arrays
-    $row_full = array_merge($row_films, $row_series, $row_games)
-
-    // kollar om 'popularity_week' för det första array-elementet är mindre än det för det andra
-    function sortByPopularity($a, $b) {
-        return $a['popularity_week'] < $b['popularity_week'];
+function retrieveSortedList($conn, $item_type, $factor, $order, $lim){
+    
+    if($order == "asc") {
+        if($item_type == "any") {
+            $sql = "SELECT * FROM `items` ORDER BY $factor ASC LIMIT $lim;";
+        } else {
+            $sql = "SELECT * FROM `items` WHERE `type` = $item_type ORDER BY $factor ASC LIMIT $lim;";
+        }
+    } else if($order == "desc") {
+        if($item_type == "any") {
+            $sql = "SELECT * FROM `items` ORDER BY $factor DESC LIMIT $lim;";
+        } else {
+            $sql = "SELECT * FROM `items` WHERE `type` = $item_type ORDER BY $factor DESC LIMIT $lim;";
+        }
     }
 
-    // sorterar med hjälp av funktionen ovan
-    usort($row_full, 'sortByPopularity');
+    $result = mysqli_query($conn, $sql);
+    $items = mysqli_fetch_assoc($result);
 
-    // tar successivt bort sista elementet i listan tills efterfrågad mängd återstår
-    while (count($row_full) > $lim) {
-        array_pop($row_full)
+    return $items
+}
+
+function createEntry($conn, $rating, $like, $user_id, $item_type, $item_id, $re, $date_completion, $date_first){
+        
+    if ($rating <= 0 || $rating >= 5) {
+        header("location: ../index.php?error=falserating");
+        exit();
     }
 
-    return $row_full
+    $sql = "INSERT INTO `entries` (`rating`, `like`, `user_id`, `item_type`, `item_id`, `re`, `date_completion`, `date_first`) VALUES (?, ?, ?, ?, ?);";
+    
+    $stmt = mysqli_stmt_init($conn);
+
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("location: ../index.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "diisiiii", $rating, $like, $user_id, $item_type, $item_id, $re, $date_completion, $date_first);
+    // timestamp är integer
+
+    mysqli_stmt_execute($stmt);
+
+    mysqli_stmt_close($stmt);
 }

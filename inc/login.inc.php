@@ -1,7 +1,7 @@
 <?php
 
 if (isset($_POST["submit"])) {
-    $username = $_POST["uid"]; //the variable username works for both email and username
+    $username = $_POST["uid"];
     $pwd = $_POST["pwd"];
 
     require_once 'dbh.inc.php';
