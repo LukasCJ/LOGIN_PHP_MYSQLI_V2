@@ -1,6 +1,6 @@
 <?php 
     include 'header.php';
-
+    
     // real_escape_string hindrar skadliga strängar i get-metoden
     $type = mysqli_real_escape_string($conn, $_GET['type']);
     $id = mysqli_real_escape_string($conn, $_GET['id']);
@@ -18,11 +18,11 @@
     if (isset($_SESSION["useruid"])):
 ?>
 
-<form action="inc/log.inc.php" method="post" id="log_overlay">
+<?php echo "<form action='inc/log.inc.php?type=".$item['type']."&id=".$item['id']."' method='post' id='log_overlay'>"; ?>
     <div class="overlay_box">
         <div class="rate_wrapper">
-            <div class="poster_container"><img src="img/metadata/poster.jpg" alt="Poster"></div>
-            <div><?php echo htmlspecialchars($item['name']); ?><br>(<?php echo htmlspecialchars(date('Y', strtotime($item['date']))); ?>)</h3></div>
+            <div class="poster_container"><img src=<?php echo $item['poster_path']; ?> alt="Poster"></div>
+            <div><h3><?php echo htmlspecialchars($item['name']);?><br>(<?php echo htmlspecialchars(date('Y', strtotime($item['date'])));?>)</h3></div>
         </div>
         <input type="number" name="rating" min="1" max="5" step="0.1" placeholder="Rate">
         <input type="date" name="date">

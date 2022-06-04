@@ -4,16 +4,9 @@ if (isset($_SESSION["useruid"])){
     include_once 'list_recent.php';
 } 
 
-$sql = "SELECT * FROM `items` ORDER BY `popularity_week` DESC LIMIT 7;";
+require_once 'inc/functions.inc.php';
+$items = retrieveSortedList($conn, "*", "popularity_week", "desc", 7);
 
-$result = mysqli_query($conn, $sql);
-
-// multi-dimensionell, associativ array
-$items = mysqli_fetch_all($result, MYSQLI_ASSOC); 
-
-mysqli_free_result($result);
-
-mysqli_close($conn);
 ?>
 
 <section>

@@ -121,12 +121,6 @@ nav {
     column-gap: var(--gap1);
 }
 
-.icon.star {
-    background-color: var(--color1);
-    -webkit-mask: url(../icon/star.svg) no-repeat center;
-    mask: url(../icon/star.svg) no-repeat center;
-}
-
 .sub_header {
     width: 100%;
 

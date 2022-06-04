@@ -28,7 +28,7 @@
                     echo '<a href="profile.php" class="button">Profile</a>';
                 }
             ?>
-            <form action="inc/search.inc.php" method="post" id="search_form">
+            <form action="grid.php" method="post" id="search_form">
                 <input type="text" name="search" placeholder="Search">
                 <button class="button" type="submit" name="submit-search">Search</button>
             </form>

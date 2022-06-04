@@ -3,7 +3,6 @@
 // SIGNUP & LOGIN
 
 function emptyInputSignup($name, $email, $username, $pwd, $pwdRe) {
-    $result;
     if (empty($name) || empty($email) || empty($username) || empty($pwd) || empty($pwdRe)) {
         $result = true;
     } 
@@ -14,7 +13,6 @@ function emptyInputSignup($name, $email, $username, $pwd, $pwdRe) {
 }
 
 function invalidUid($username) {
-    $result;
     if (!preg_match("/^[a-zA-Z0-9]*$/", $username)) {
         $result = true;
     } 
@@ -25,7 +23,6 @@ function invalidUid($username) {
 }
 
 function invalidEmail($email) {
-    $result;
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $result = true;
     } 
@@ -36,7 +33,6 @@ function invalidEmail($email) {
 }
 
 function pwdMatch($pwd, $pwdRe) {
-    $result;
     if ($pwd !== $pwdRe) {
         $result = true;
     } 
@@ -88,7 +84,6 @@ function createUser($conn, $name, $email, $username, $pwd) {
 }
 
 function emptyInputLogin($username, $pwd) {
-    $result;
     if (empty($username) || empty($pwd)) {
         $result = true;
     } 
@@ -123,73 +118,80 @@ function loginUser($conn, $username, $pwd) {
 
 // RATING
 
-function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje gång någon betygsätter saken. borde man kanske göra så att den inte börjar från början varje gång?
+// returnerar en tvådimensionell, associativ array av "items", dvs filmer, serier och spel, sorterad utefter angiven faktor, exempelvis genomsnittligt betyg eller popularitet
+// används exempelvis
+// argument 1: koppling till databasen
+// argument 2: item:ets typ, dvs film, serie eller spel
+// argument 3: faktorn listan sorteras utefter
+// argument 4: ordning. ASC innebär ascending, nerifrån och upp, medan DESC innebär descending, uppifrån och ner
+// argument 5: gräns för arrayen. vi behöver inga oändliga listor
+function retrieveSortedList($conn, $item_type, $factor, $order, $lim) {
     
-    // skriven query för att hämta värden
-    $sql = "SELECT `rating` FROM `ratings` WHERE `item_id` = $item_id AND `item_type` = $item_type AND `rating` >= 0.1;";
-    
-    // utför, hämta resultat
+    if ($order == "asc") {
+        if($item_type == "*") {
+            // skriven query för att hämta värden
+            $sql = "SELECT * FROM `items` ORDER BY '$factor' ASC LIMIT $lim;";
+        } else {
+            $sql = "SELECT * FROM `items` WHERE `type` = '$item_type' ORDER BY '$factor' ASC LIMIT $lim;";
+        }
+    } else if ($order == "desc") {
+        if ($item_type == "*") {
+            $sql = "SELECT * FROM `items` ORDER BY '$factor' DESC LIMIT $lim;";
+        } else {
+            $sql = "SELECT * FROM `items` WHERE `type` = '$item_type' ORDER BY '$factor' DESC LIMIT $lim;";
+        }
+    }
+
+    // utför query, hämtar resultat
     $result = mysqli_query($conn, $sql);
 
-    // fetch:ar resulterande värden som en array, ett format vi kan använda
-    $ratings = mysqli_fetch_array($result);
-    
-    // summera ratings
-    $sum = array_sum($ratings);
+    // skapar arrayen
+    $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-    // medelvärde
-    $avg = $sum / count($ratings);
-
-    // för att uppdatera avg
-    $sql = "UPDATE `items` SET `rating` = $avg WHERE `type` = '$item_type' AND `id` = $item_id;";
-    
-    // utför
-    mysqli_query($conn, $sql);
+    return $items;
 }
 
+// tar in betygsättningen och kollar så att inget skumt värde har angivits
+// vi vill bara tillåta tal med en enda decimal som ligger mellan 0.1 och 5
 function invalidRating($rating) {
 
     $result = true;
     $i = 0.1;
 
-    while($result && $i <= 5) { // vi vill bara tillåta tal med en decimal och mellan 0.1 och 5
-
+    while($result && ($i <= 5)) {
         if($rating == $i) {
-
             $result = false;
-
         }
-
         $i += 0.1;
-
     }
 
     return $result;
 }
 
+// betygsättningen.
+// tar in värden för alla kolumner i ratings-tablet, samt koppling till databasen
 function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
 
-    // räknar antalet rader i ratings som uppfyller angivna kriterier
-    $sql = "SELECT * FROM `ratings` WHERE `user_id` = $user_id AND `item_type` = $item_type AND `item_id` = $item_id;";
+    // kollar efter rader i ratings som uppfyller personen och item:et. nämligen en betygsättning per person och item
+    $sql = "SELECT * FROM `ratings` WHERE `user_id` = $user_id AND `item_type` = '$item_type' AND `item_id` = $item_id;";
     
     $result = mysqli_query($conn, $sql);
 
     // bestämmer om det finns en rad som ska uppdateras eller om en ny rad ska skapas
-    if(mysqli_fetch_array($conn, $sql)){
+    if(mysqli_fetch_all($conn, MYSQLI_ASSOC)){
         $sql = "UPDATE `ratings` SET `rating` = ? AND `like` = ? WHERE `user_id` = ? AND `item_type` = ? AND `item_id` = ?;";
     } else {
         $sql = "INSERT INTO `ratings` (`rating`, `like`, `user_id`, `item_type`, `item_id`) VALUES (?, ?, ?, ?, ?);";
     }
 
-    // initierar mysql statement
+    // initierar mysqli statement
     $stmt = mysqli_stmt_init($conn);
     // används för att hindra sql injection
-    // behövs främst vid användning av input-fält
-    // används i denna funktion ifall input-fält används för att betygsätta
+    // behövs främst vid användning av input-fält<
 
     // förbereder statement, samt kollar om något går fel. innebär i princip att query:n skickas till databasen i förväg för att hindra injection
     if (!mysqli_stmt_prepare($stmt, $sql)) {
-        //header("location: ../signup.php?error=stmtfailed");
+        header("location: ../index.php?error=stmtfailed");
         exit();
     }
 
@@ -202,83 +204,15 @@ function rate($conn, $user_id, $item_type, $item_id, $rating, $like){
 
     // stänger statement
     mysqli_stmt_close($stmt);
+
+    header("location: ../index.php");
+    exit();
 }
 
-function popularityAllTime($conn, $item_type, $item_id){
-    
-    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = '$item_type';";
-
-    $result = mysqli_query($conn, $sql);
-
-    $array = mysqli_fetch_array($result);
-    $value = intval($array[0]);
-
-    $sql = "UPDATE `items` SET `popularity_all` = $value WHERE `type` = '$item_type' AND `id` = $item_id;";
-    
-    mysqli_query($conn, $sql);
-}
-
-function popularityThisWeek($conn, $item_type, $item_id) {
-
-    // hämtar tiden för en vecka sedan och gör till passande format
-    $tmp = strtotime("-1 Week");
-    $date_lim = date("Y-m-d H:i:s", $tmp);
-    // hur fixar man för tidszoner?
-
-    $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = '$item_type' AND `date_completion` >= '$date_lim';";
-
-    $result = mysqli_query($conn, $sql);
-
-    $array = mysqli_fetch_array($result);
-    $value = intval($array[0]);
-
-    $sql = "UPDATE `items` SET `popularity_week` = $value WHERE `type` = '$item_type' AND `id` = $item_id;";
-    
-    mysqli_query($conn, $sql);
-}
-
-function retrieveSortedList($conn, $item_type, $factor, $order, $lim) {
-    
-    if ($order == "asc") {
-
-        if($item_type == "*") {
-
-            $sql = "SELECT * FROM `items` ORDER BY '$factor' ASC LIMIT $lim;";
-
-        } else {
-
-            $sql = "SELECT * FROM `items` WHERE `type` = '$item_type' ORDER BY '$factor' ASC LIMIT $lim;";
-
-        }
-
-    } else if ($order == "desc") {
-
-        if ($item_type == "*") {
-
-            $sql = "SELECT * FROM `items` ORDER BY '$factor' DESC LIMIT $lim;";
-
-        } else {
-        
-            $sql = "SELECT * FROM `items` WHERE `type` = '$item_type' ORDER BY '$factor' DESC LIMIT $lim;";
-
-        }
-    }
-
-    $result = mysqli_query($conn, $sql);
-
-    $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-    return $items;
-}
-
+//liknar rate-funktionen men inkluderar datum, samt om personen sett filmen eller spelat spelet förut, och den skapar alltid ny rad i entries-tablet
 function createEntry($conn, $rating, $like, $user_id, $item_type, $item_id, $re, $date_completion, $date_first){
-        
-    if ($rating <= 0 || $rating >= 5) {
-        header("location: ../index.php?error=falserating");
-        exit();
-    }
 
-    $sql = "INSERT INTO `entries` (`rating`, `like`, `user_id`, `item_type`, `item_id`, `re`, `date_completion`, `date_first`) VALUES (?, ?, ?, ?, ?);";
+    $sql = "INSERT INTO `entries` (`rating`, `like`, `user_id`, `item_type`, `item_id`, `re`, `date_completion`, `date_first`) VALUES (?, ?, ?, ?, ?; ?, ?, ?);";
     
     $stmt = mysqli_stmt_init($conn);
 
@@ -293,4 +227,64 @@ function createEntry($conn, $rating, $like, $user_id, $item_type, $item_id, $re,
     mysqli_stmt_execute($stmt);
 
     mysqli_stmt_close($stmt);
+
+    header("location: ../index.php");
+    exit();
 }
+
+// function avgRating($conn, $item_type, $item_id){ // tänkt att uppdatera varje gång någon betygsätter saken. borde man kanske göra så att den inte börjar från början varje gång?
+    
+//     // skriven query för att hämta värden
+//     $sql = "SELECT `rating` FROM `ratings` WHERE `item_id` = $item_id AND `item_type` = $item_type AND `rating` >= 0.1;";
+    
+//     // utför, hämta resultat
+//     $result = mysqli_query($conn, $sql);
+
+//     // fetch:ar resulterande värden som en array, ett format vi kan använda
+//     $ratings = mysqli_fetch_array($result);
+    
+//     // summera ratings
+//     $sum = array_sum($ratings);
+
+//     // medelvärde
+//     $avg = $sum / count($ratings);
+
+//     // för att uppdatera avg
+//     $sql = "UPDATE `items` SET `rating` = $avg WHERE `type` = '$item_type' AND `id` = $item_id;";
+    
+//     // utför
+//     mysqli_query($conn, $sql);
+// }
+
+// function popularityAllTime($conn, $item_type, $item_id){
+    
+//     $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = '$item_type';";
+
+//     $result = mysqli_query($conn, $sql);
+
+//     $array = mysqli_fetch_array($result);
+//     $value = intval($array[0]);
+
+//     $sql = "UPDATE `items` SET `popularity_all` = $value WHERE `type` = '$item_type' AND `id` = $item_id;";
+    
+//     mysqli_query($conn, $sql);
+// }
+
+// function popularityThisWeek($conn, $item_type, $item_id) {
+
+//     // hämtar tiden för en vecka sedan och gör till passande format
+//     $tmp = strtotime("-1 Week");
+//     $date_lim = date("Y-m-d H:i:s", $tmp);
+//     // hur fixar man för tidszoner?
+
+//     $sql = "SELECT COUNT(*) FROM `entries` WHERE `item_id` = $item_id AND `item_type` = '$item_type' AND `date_completion` >= '$date_lim';";
+
+//     $result = mysqli_query($conn, $sql);
+
+//     $array = mysqli_fetch_array($result);
+//     $value = intval($array[0]);
+
+//     $sql = "UPDATE `items` SET `popularity_week` = $value WHERE `type` = '$item_type' AND `id` = $item_id;";
+    
+//     mysqli_query($conn, $sql);
+// }
